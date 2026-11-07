@@ -78,11 +78,29 @@ footer{text-align:center;color:#999;padding:30px}
 </section>
 </main>
 
+<section class="panel" id="admin">
+<h2>Admin WarungTKS</h2>
+<p><small>Masuk untuk mengelola katalog dan melihat pesanan.</small></p>
+<input id="adminPass" type="password" placeholder="Password admin">
+<button onclick="adminLogin()">Masuk Admin</button>
+<div id="adminArea" style="display:none">
+<h3>Tambah Produk</h3>
+<input id="newName" placeholder="Nama barang">
+<input id="newPrice" type="number" placeholder="Harga eceran (Rp)">
+<input id="newWholesale" type="number" placeholder="Harga grosir (Rp)">
+<input id="newMin" type="number" value="12" placeholder="Minimal pembelian grosir">
+<input id="newStock" type="number" value="0" placeholder="Stok">
+<button onclick="simpanProduk()">Simpan Produk</button>
+<h3>Daftar Produk</h3><div id="adminProducts"></div>
+<h3>Pesanan Masuk</h3><button onclick="muatPesanan()">Muat Pesanan</button><div id="adminOrders"></div>
+</div><p id="adminMsg"></p>
+</section>
 <footer>© 2026 WarungTKS - Belanja Hemat dan Praktis</footer>
 
 <script>
 const API="https://warungtks-backend-production-b067.up.railway.app";
 const NOMOR_WA="6283873608715";
+let adminPassword="";
 
 const barang=[
 {name:"Beras 5 Kg",price:75000,icon:"🍚"},
@@ -227,6 +245,18 @@ async function hitungOngkir(){
   }
 }
 
+async function adminLogin(){
+ adminPassword=document.getElementById("adminPass").value;
+ const msg=document.getElementById("adminMsg");
+ try{const r=await fetch(API+"/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPassword})});const j=await r.json();if(!r.ok)throw new Error(j.error||"Login gagal");document.getElementById("adminArea").style.display="block";msg.innerText="Berhasil masuk.";muatProdukAdmin();}catch(e){msg.innerText=e.message;}
+}
+async function adminFetch(path,opts={}){return fetch(API+path,{...opts,headers:{"Content-Type":"application/json","x-admin-password":adminPassword,...(opts.headers||{})}});}
+async function simpanProduk(){
+ const data={name:document.getElementById("newName").value,price:Number(document.getElementById("newPrice").value),wholesale_price:Number(document.getElementById("newWholesale").value),wholesale_min:Number(document.getElementById("newMin").value)||12,stock:Number(document.getElementById("newStock").value)||0};
+ try{const r=await adminFetch("/api/admin/products",{method:"POST",body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminMsg").innerText="Produk tersimpan.";muatProdukAdmin();}catch(e){document.getElementById("adminMsg").innerText=e.message;}
+}
+async function muatProdukAdmin(){try{const r=await adminFetch("/api/admin/products");const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminProducts").innerHTML=j.data.map(p=>"<p>"+p.name+" — "+rupiah(p.price)+" | stok "+p.stock+"</p>").join("")||"Belum ada produk di database.";}catch(e){document.getElementById("adminProducts").innerText=e.message;}}
+async function muatPesanan(){try{const r=await adminFetch("/api/admin/orders");const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminOrders").innerHTML=j.data.map(o=>"<div class='cartitem'><span>#"+o.id+" "+o.customer_name+"<br><small>"+o.phone+" · "+o.status+"</small></span><b>"+rupiah(o.total)+"</b></div>").join("")||"Belum ada pesanan tersimpan.";}catch(e){document.getElementById("adminOrders").innerText=e.message;}}
 function pesan(){
   if(!Object.keys(keranjang).length){
     alert("Keranjang masih kosong");
