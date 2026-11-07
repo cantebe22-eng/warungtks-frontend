@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WarungTKS - Belanja Sembako</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
+header{background:#090909;padding:22px 16px;border-bottom:1px solid #b89545}
+.logo{font-size:27px;font-weight:bold;color:#e5c16b}
+.logo span{color:white}
+header p{color:#aaa;margin-bottom:0}
+main{padding:18px}
+h2{color:#e5c16b}
+.hero{background:linear-gradient(120deg,#292015,#080808);padding:28px 20px;border-radius:14px;margin-bottom:25px}
+.hero h1{color:#e6c36b}
+button{background:#c49a43;color:#111;border:0;padding:12px 18px;border-radius:7px;font-weight:bold;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.product{background:#1c1c1c;border:1px solid #4d4028;border-radius:10px;padding:12px}
+.product .pic{font-size:42px;text-align:center;padding:15px}
+.product h3{font-size:15px}
+.price{color:#e5c16b;font-weight:bold}
+.product button{width:100%;margin-top:10px}
+.panel{background:#1c1c1c;padding:16px;border-radius:12px;margin-top:22px}
+input,select{width:100%;padding:13px;margin:7px 0;background:#101010;color:white;border:1px solid #777;border-radius:6px}
+.cartitem{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #444}
+small{color:#bbb}
+#result{font-size:14px;color:#e5c16b;line-height:1.6}
+footer{text-align:center;color:#999;padding:30px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">WARUNG<span>TKS</span></div>
+<p>Belanja Sembako Mudah dan Hemat</p>
+</header>
+
+<main>
+<section class="hero">
+<h1>Selamat Datang di WarungTKS</h1>
+<p>Belanja sembako dan kebutuhan harian dengan mudah.</p>
+<button onclick="document.getElementById('produk').scrollIntoView()">Belanja Sekarang</button>
+</section>
+
+<h2 id="produk">Katalog Produk</h2>
+<div class="products" id="products"></div>
+
+<section class="panel">
+<h2>Keranjang Belanja</h2>
+<div id="cart">Keranjang masih kosong.</div>
+<p>Total barang: <b id="total">Rp0</b></p>
+</section>
+
+<section class="panel">
+<h2>Checkout & Pengiriman</h2>
+<input id="nama" placeholder="Nama pembeli">
+<input id="hp" placeholder="Nomor WhatsApp">
+<input id="alamat" placeholder="Alamat lengkap penerima">
+
+<h3>Cari kecamatan / kelurahan tujuan</h3>
+<input id="search" placeholder="Contoh: Kranji, Bekasi">
+<button onclick="cariLokasi()">Cari Lokasi</button>
+<div id="locations"></div>
+
+<h3>Pilih Kurir</h3>
+<select id="courier">
+<option value="jne">JNE</option>
+<option value="jnt">J&T</option>
+<option value="sicepat">SiCepat</option>
+<option value="pos">POS Indonesia</option>
+</select>
+<button onclick="hitungOngkir()">Hitung Ongkir</button>
+<div id="result"></div>
+<button onclick="pesan()" style="width:100%;margin-top:20px">Buat Pesanan</button>
+</section>
+</main>
+
+<footer>© 2026 WarungTKS - Belanja Hemat dan Praktis</footer>
+
+<script>
+const API="https://warungtks-backend-production-b067.up.railway.app";
+
+const barang=[
+{name:"Beras 5 Kg",price:75000,icon:"🍚"},
+{name:"Minyak Goreng 1 Liter",price:19000,icon:"🛢️"},
+{name:"Gula Pasir 1 Kg",price:17000,icon:"🍬"},
+{name:"Tepung Terigu 1 Kg",price:12000,icon:"🌾"},
+{name:"Tepung Aci 1 Kg",price:12000,icon:"🥣"},
+{name:"Telur 1 Kg",price:29000,icon:"🥚"},
+{name:"Mie Instan",price:3500,icon:"🍜"},
+{name:"Kopi Sachet",price:2000,icon:"☕"}
+];
+
+let keranjang={};
+let tujuan=null;
+let ongkir=0;
+
+const rupiah=n=>"Rp"+Number(n).toLocaleString("id-ID");
+
+function tampilProduk(){
+document.getElementById("products").innerHTML=barang.map((p,i)=>`
+<div class="product">
+<div class="pic">${p.icon}</div>
+<h3>${p.name}</h3>
+<div class="price">${rupiah(p.price)}</div>
+<button onclick="tambah(${i})">Tambah</button>
+</div>`).join("");
+}
+
+function tambah(i){
+keranjang[i]=(keranjang[i]||0)+1;
+tampilKeranjang();
+}
+
+function tampilKeranjang(){
+let keys=Object.keys(keranjang);
+let total=0;
+let html="";
+keys.forEach(i=>{
+let p=barang[i],q=keranjang[i];
+total+=p.price*q;
+html+=`<div class="cartitem">
+<span>${p.name} x ${q}</span>
+<span>${rupiah(p.price*q)}</span>
+</div>`;
+});
+document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
+document.getElementById("total").innerText=rupiah(total);
+}
+
+async function cariLokasi(){
+let s=document.getElementById("search").value.trim();
+if(s.length<3){alert("Masukkan minimal 3 huruf");return;}
+let box=document.getElementById("locations");
+box.innerText="Mencari lokasi...";
+try{
+let r=await fetch(API+"/api/destination/search?search="+encodeURIComponent(s));
+let j=await r.json();
+let data=j.data||[];
+if(!data.length){box.innerText="Lokasi tidak ditemukan";return;}
+box.innerHTML=data.map((d,i)=>`
+<button style="display:block;margin:8px 0;width:100%"
+onclick="pilihLokasi(${i})">${d.label}</button>`).join("");
+window.hasillokasi=data;
+}catch(e){box.innerText="Gagal mencari lokasi. Periksa koneksi.";}
+}
+
+function pilihLokasi(i){
+tujuan=window.hasillokasi[i];
+document.getElementById("locations").innerText=
+"Tujuan dipilih: "+tujuan.label;
+}
+
+async function hitungOngkir(){
+if(!tujuan){alert("Pilih lokasi tujuan dahulu");return;}
+let weight=0;
+Object.keys(keranjang).forEach(i=>{
+weight+=keranjang[i]*1000;
+});
+if(!weight){alert("Keranjang masih kosong");return;}
+let box=document.getElementById("result");
+box.innerText="Menghitung ongkir...";
+try{
+let r=await fetch(API+"/api/shipping/cost",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+destination:tujuan.id,
+weight:weight,
+courier:document.getElementById("courier").value
+})
+});
+let j=await r.json();
+if(!r.ok){box.innerText=j.message||"Gagal menghitung ongkir.";return;}
+box.innerText=JSON.stringify(j,null,2);
+}catch(e){box.innerText="Gagal terhubung ke server ongkir.";}
+}
+
+function pesan(){
+if(!Object.keys(keranjang).length){
+alert("Keranjang masih kosong");return;
+}
+let nama=document.getElementById("nama").value.trim();
+let hp=document.getElementById("hp").value.trim();
+let alamat=document.getElementById("alamat").value.trim();
+if(!nama||!hp||!alamat||!tujuan){
+alert("Lengkapi nama, nomor HP, alamat, dan lokasi tujuan.");return;
+}
+let total=0,detail="";
+Object.keys(keranjang).forEach(i=>{
+let p=barang[i],q=keranjang[i];
+total+=p.price*q;
+detail+=`${p.name} x ${q}\n`;
+});
+alert("Pesanan berhasil disiapkan!\n\n"+
+"Nama: "+nama+"\n"+
+"HP: "+hp+"\n"+
+"Barang:\n"+detail+
+"Total barang: "+rupiah(total)+
+"\n\nSilakan hubungi admin untuk konfirmasi pembayaran dan pengiriman.");
+}
+
+tampilProduk();
+</script>
+</body>
+</html>
