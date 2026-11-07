@@ -95,7 +95,7 @@ const barang=[
 {name:"Kopi Sachet",price:2000,icon:"☕"}
 ];
 
-let keranjang={};
+let keranjang=JSON.parse(localStorage.getItem("warungtks_cart")||"{}");
 let tujuan=null;
 let ongkir=0;
 let ongkirTerhitung=false;
@@ -118,10 +118,15 @@ function tampilProduk(){
     </div>`).join("");
 }
 
+function simpanKeranjang(){localStorage.setItem("warungtks_cart",JSON.stringify(keranjang));}
+function ubahJumlah(i,delta){
+  keranjang[i]=(keranjang[i]||0)+delta;
+  if(keranjang[i]<=0) delete keranjang[i];
+  simpanKeranjang(); resetOngkir(); tampilKeranjang();
+}
 function tambah(i){
   keranjang[i]=(keranjang[i]||0)+1;
-  resetOngkir();
-  tampilKeranjang();
+  simpanKeranjang(); resetOngkir(); tampilKeranjang();
 }
 
 function tampilKeranjang(){
@@ -131,10 +136,7 @@ function tampilKeranjang(){
   keys.forEach(i=>{
     let p=barang[i],q=keranjang[i];
     total+=p.price*q;
-    html+=`<div class="cartitem">
-      <span>${p.name} x ${q}</span>
-      <span>${rupiah(p.price*q)}</span>
-    </div>`;
+    html+=`<div class="cartitem"><span>${p.name}<br><small>${rupiah(p.price)} / pcs</small><br><button onclick="ubahJumlah(${i},-1)" style="padding:5px 11px">−</button> ${q} <button onclick="ubahJumlah(${i},1)" style="padding:5px 11px">+</button></span><b>${rupiah(p.price*q)}</b></div>`;
   });
   document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
   document.getElementById("total").innerText=rupiah(total);
