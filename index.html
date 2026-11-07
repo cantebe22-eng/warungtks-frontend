@@ -178,29 +178,47 @@ box.innerText=JSON.stringify(j,null,2);
 }catch(e){box.innerText="Gagal terhubung ke server ongkir.";}
 }
 
+
 function pesan(){
-if(!Object.keys(keranjang).length){
-alert("Keranjang masih kosong");return;
-}
-let nama=document.getElementById("nama").value.trim();
-let hp=document.getElementById("hp").value.trim();
-let alamat=document.getElementById("alamat").value.trim();
-if(!nama||!hp||!alamat||!tujuan){
-alert("Lengkapi nama, nomor HP, alamat, dan lokasi tujuan.");return;
-}
-let total=0,detail="";
-Object.keys(keranjang).forEach(i=>{
-let p=barang[i],q=keranjang[i];
-total+=p.price*q;
-detail+=`${p.name} x ${q}\n`;
-});
-alert("Pesanan berhasil disiapkan!\n\n"+
-"Nama: "+nama+"\n"+
-"HP: "+hp+"\n"+
-"Barang:\n"+detail+
-"Total barang: "+rupiah(total)+
-"\n\nSilakan hubungi admin untuk konfirmasi pembayaran dan pengiriman.");
-}
+  if(!Object.keys(keranjang).length){
+    alert("Keranjang masih kosong");
+    return;
+  }
+
+  let nama=document.getElementById("nama").value.trim();
+  let hp=document.getElementById("hp").value.trim();
+  let alamat=document.getElementById("alamat").value.trim();
+  let tujuan=document.getElementById("tujuan").value;
+
+  if(!nama || !hp || !alamat || !tujuan){
+    alert("Lengkapi semua data pesanan");
+    return;
+  }
+
+  let total=0;
+  let detail="";
+
+  Object.keys(keranjang).forEach(i=>{
+    let p=barang[i],q=keranjang[i];
+    total+=p.price*q;
+    detail+=`${p.name} x ${q} = ${rupiah(p.price*q)}\n`;
+  });
+
+  let pesanWA=
+    "PESANAN WARUNGTKS\n\n"+
+    "Nama: "+nama+"\n"+
+    "HP: "+hp+"\n"+
+    "Alamat: "+alamat+"\n"+
+    "Tujuan: "+tujuan+"\n\n"+
+    "DAFTAR BARANG:\n"+detail+
+    "\nTOTAL: "+rupiah(total);
+
+  let url="https://wa.me/6283873608715?text="+
+    encodeURIComponent(pesanWA);
+
+  window.location.href=url;
+  }
+  
 
 tampilProduk();
 </script>
