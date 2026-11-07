@@ -20,7 +20,7 @@ button{background:#c49a43;color:#111;border:0;padding:12px 18px;border-radius:7p
 .product{background:#1c1c1c;border:1px solid #4d4028;border-radius:10px;padding:12px}
 .product .pic{font-size:42px;text-align:center;padding:15px}
 .product h3{font-size:15px}
-.price{color:#e5c16b;font-weight:bold}
+.price{color:#e5c16b;font-weight:bold}.wholesale{color:#9bd39b;font-size:12px;margin-top:5px}
 .product button{width:100%;margin-top:10px}
 .panel{background:#1c1c1c;padding:16px;border-radius:12px;margin-top:22px}
 input,select{width:100%;padding:13px;margin:7px 0;background:#101010;color:white;border:1px solid #777;border-radius:6px}
@@ -45,7 +45,7 @@ footer{text-align:center;color:#999;padding:30px}
 <button onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Belanja Sekarang</button>
 </section>
 
-<h2 id="produk">Katalog Produk</h2>
+<h2 id="produk">Katalog Produk</h2><p><small>Harga grosir otomatis berlaku mulai 12 pcs per jenis barang (diskon 5%).</small></p>
 <div class="products" id="products"></div>
 
 <section class="panel">
@@ -113,7 +113,7 @@ function tampilProduk(){
     <div class="product">
       <div class="pic">${p.icon}</div>
       <h3>${p.name}</h3>
-      <div class="price">${rupiah(p.price)}</div>
+      <div class="price">${rupiah(p.price)}</div><div class="wholesale">Grosir 12+: ${rupiah(Math.round(p.price*0.95))}/pcs</div>
       <button onclick="tambah(${i})">Tambah</button>
     </div>`).join("");
 }
@@ -135,8 +135,9 @@ function tampilKeranjang(){
   let html="";
   keys.forEach(i=>{
     let p=barang[i],q=keranjang[i];
-    total+=p.price*q;
-    html+=`<div class="cartitem"><span>${p.name}<br><small>${rupiah(p.price)} / pcs</small><br><button onclick="ubahJumlah(${i},-1)" style="padding:5px 11px">−</button> ${q} <button onclick="ubahJumlah(${i},1)" style="padding:5px 11px">+</button></span><b>${rupiah(p.price*q)}</b></div>`;
+    let harga=q>=12?Math.round(p.price*0.95):p.price;
+    total+=harga*q;
+    html+=`<div class="cartitem"><span>${p.name}<br><small>${rupiah(harga)} / pcs ${q>=12?"(harga grosir)":""}</small><br><button onclick="ubahJumlah(${i},-1)" style="padding:5px 11px">−</button> ${q} <button onclick="ubahJumlah(${i},1)" style="padding:5px 11px">+</button></span><b>${rupiah(p.price*q)}</b></div>`;
   });
   document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
   document.getElementById("total").innerText=rupiah(total);
@@ -251,8 +252,9 @@ function pesan(){
 
   Object.keys(keranjang).forEach(i=>{
     let p=barang[i],q=keranjang[i];
-    totalBarang+=p.price*q;
-    detail+=`${p.name} x ${q} = ${rupiah(p.price*q)}\n`;
+    let harga=q>=12?Math.round(p.price*0.95):p.price;
+    totalBarang+=harga*q;
+    detail+=`${p.name} x ${q} @ ${rupiah(harga)}${q>=12?" (GROSIR)":""} = ${rupiah(harga*q)}\n`;
   });
 
   let totalAkhir=totalBarang+ongkir;
