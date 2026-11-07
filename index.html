@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,10 +24,12 @@ button{background:#c49a43;color:#111;border:0;padding:12px 18px;border-radius:7p
 .product button{width:100%;margin-top:10px}
 .panel{background:#1c1c1c;padding:16px;border-radius:12px;margin-top:22px}
 input,select{width:100%;padding:13px;margin:7px 0;background:#101010;color:white;border:1px solid #777;border-radius:6px}
-.cartitem{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #444}
+.cartitem{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #444}
 small{color:#bbb}
 #result{font-size:14px;color:#e5c16b;line-height:1.6}
+#locations button{text-align:left;white-space:normal}
 footer{text-align:center;color:#999;padding:30px}
+@media(max-width:360px){.products{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -41,7 +42,7 @@ footer{text-align:center;color:#999;padding:30px}
 <section class="hero">
 <h1>Selamat Datang di WarungTKS</h1>
 <p>Belanja sembako dan kebutuhan harian dengan mudah.</p>
-<button onclick="document.getElementById('produk').scrollIntoView()">Belanja Sekarang</button>
+<button onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Belanja Sekarang</button>
 </section>
 
 <h2 id="produk">Katalog Produk</h2>
@@ -55,9 +56,9 @@ footer{text-align:center;color:#999;padding:30px}
 
 <section class="panel">
 <h2>Checkout & Pengiriman</h2>
-<input id="nama" placeholder="Nama pembeli">
-<input id="hp" placeholder="Nomor WhatsApp">
-<input id="alamat" placeholder="Alamat lengkap penerima">
+<input id="nama" placeholder="Nama pembeli" autocomplete="name">
+<input id="hp" placeholder="Nomor WhatsApp" inputmode="tel" autocomplete="tel">
+<input id="alamat" placeholder="Alamat lengkap penerima" autocomplete="street-address">
 
 <h3>Cari kecamatan / kelurahan tujuan</h3>
 <input id="search" placeholder="Contoh: Kranji, Bekasi">
@@ -65,14 +66,14 @@ footer{text-align:center;color:#999;padding:30px}
 <div id="locations"></div>
 
 <h3>Pilih Kurir</h3>
-<select id="courier">
+<select id="courier" onchange="resetOngkir()">
 <option value="jne">JNE</option>
 <option value="jnt">J&T</option>
 <option value="sicepat">SiCepat</option>
 <option value="pos">POS Indonesia</option>
 </select>
 <button onclick="hitungOngkir()">Hitung Ongkir</button>
-<div id="result"></div>
+<div id="result">Pilih tujuan dan hitung ongkir untuk melihat biaya pengiriman.</div>
 <button onclick="pesan()" style="width:100%;margin-top:20px">Buat Pesanan</button>
 </section>
 </main>
@@ -81,6 +82,7 @@ footer{text-align:center;color:#999;padding:30px}
 
 <script>
 const API="https://warungtks-backend-production-b067.up.railway.app";
+const NOMOR_WA="6283873608715";
 
 const barang=[
 {name:"Beras 5 Kg",price:75000,icon:"🍚"},
@@ -96,63 +98,73 @@ const barang=[
 let keranjang={};
 let tujuan=null;
 let ongkir=0;
+let ongkirTerhitung=false;
 
 const rupiah=n=>"Rp"+Number(n).toLocaleString("id-ID");
 
+function resetOngkir(){
+  ongkir=0;
+  ongkirTerhitung=false;
+  document.getElementById("result").innerText="Pilihan kurir berubah. Hitung ulang ongkir.";
+}
+
 function tampilProduk(){
-document.getElementById("products").innerHTML=barang.map((p,i)=>`
-<div class="product">
-<div class="pic">${p.icon}</div>
-<h3>${p.name}</h3>
-<div class="price">${rupiah(p.price)}</div>
-<button onclick="tambah(${i})">Tambah</button>
-</div>`).join("");
+  document.getElementById("products").innerHTML=barang.map((p,i)=>`
+    <div class="product">
+      <div class="pic">${p.icon}</div>
+      <h3>${p.name}</h3>
+      <div class="price">${rupiah(p.price)}</div>
+      <button onclick="tambah(${i})">Tambah</button>
+    </div>`).join("");
 }
 
 function tambah(i){
-keranjang[i]=(keranjang[i]||0)+1;
-tampilKeranjang();
+  keranjang[i]=(keranjang[i]||0)+1;
+  resetOngkir();
+  tampilKeranjang();
 }
 
 function tampilKeranjang(){
-let keys=Object.keys(keranjang);
-let total=0;
-let html="";
-keys.forEach(i=>{
-let p=barang[i],q=keranjang[i];
-total+=p.price*q;
-html+=`<div class="cartitem">
-<span>${p.name} x ${q}</span>
-<span>${rupiah(p.price*q)}</span>
-</div>`;
-});
-document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
-document.getElementById("total").innerText=rupiah(total);
+  let keys=Object.keys(keranjang);
+  let total=0;
+  let html="";
+  keys.forEach(i=>{
+    let p=barang[i],q=keranjang[i];
+    total+=p.price*q;
+    html+=`<div class="cartitem">
+      <span>${p.name} x ${q}</span>
+      <span>${rupiah(p.price*q)}</span>
+    </div>`;
+  });
+  document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
+  document.getElementById("total").innerText=rupiah(total);
 }
 
 async function cariLokasi(){
-let s=document.getElementById("search").value.trim();
-if(s.length<3){alert("Masukkan minimal 3 huruf");return;}
-let box=document.getElementById("locations");
-box.innerText="Mencari lokasi...";
-try{
-let r=await fetch(API+"/api/destination/search?search="+encodeURIComponent(s));
-let j=await r.json();
-let data=j.data||[];
-if(!data.length){box.innerText="Lokasi tidak ditemukan";return;}
-box.innerHTML=data.map((d,i)=>`
-<button style="display:block;margin:8px 0;width:100%"
-onclick="pilihLokasi(${i})">${d.label}</button>`).join("");
-window.hasillokasi=data;
-}catch(e){box.innerText="Gagal mencari lokasi. Periksa koneksi.";}
+  let s=document.getElementById("search").value.trim();
+  if(s.length<3){alert("Masukkan minimal 3 huruf");return;}
+  let box=document.getElementById("locations");
+  box.innerText="Mencari lokasi...";
+  try{
+    let r=await fetch(API+"/api/destination/search?search="+encodeURIComponent(s));
+    let j=await r.json();
+    let data=j.data||[];
+    if(!r.ok){box.innerText=j.message||"Gagal mencari lokasi";return;}
+    if(!data.length){box.innerText="Lokasi tidak ditemukan";return;}
+    window.hasillokasi=data;
+    box.innerHTML=data.map((d,i)=>`
+      <button style="display:block;margin:8px 0;width:100%"
+      onclick="pilihLokasi(${i})">${d.label}</button>`).join("");
+  }catch(e){
+    box.innerText="Gagal mencari lokasi. Periksa koneksi internet.";
+  }
 }
 
 function pilihLokasi(i){
-tujuan=window.hasillokasi[i];
-document.getElementById("locations").innerText=
-"Tujuan dipilih: "+tujuan.label;
+  tujuan=window.hasillokasi[i];
+  resetOngkir();
+  document.getElementById("locations").innerText="Tujuan dipilih: "+tujuan.label;
 }
-
 
 async function hitungOngkir(){
   if(!tujuan){
@@ -172,6 +184,7 @@ async function hitungOngkir(){
 
   let box=document.getElementById("result");
   box.innerText="Menghitung ongkir...";
+  ongkirTerhitung=false;
 
   try{
     let r=await fetch(API+"/api/shipping/cost",{
@@ -192,7 +205,6 @@ async function hitungOngkir(){
     }
 
     let daftar=j.data||[];
-
     if(!daftar.length){
       box.innerText="Tarif ongkir tidak ditemukan";
       return;
@@ -200,19 +212,17 @@ async function hitungOngkir(){
 
     let x=daftar[0];
     ongkir=Number(x.cost)||0;
+    ongkirTerhitung=true;
 
     box.innerHTML=
       "<b>"+x.name+" - "+x.description+"</b><br>"+
       "<h2>"+rupiah(ongkir)+"</h2>"+
       "<small>Layanan: "+x.service+
       (x.etd?" | Estimasi: "+x.etd:"")+"</small>";
-
   }catch(e){
-    box.innerText="Gagal terhubung ke server ongkir";
+    box.innerText="Gagal terhubung ke server ongkir. Coba lagi.";
   }
 }
-  
-
 
 function pesan(){
   if(!Object.keys(keranjang).length){
@@ -223,39 +233,48 @@ function pesan(){
   let nama=document.getElementById("nama").value.trim();
   let hp=document.getElementById("hp").value.trim();
   let alamat=document.getElementById("alamat").value.trim();
-  let tujuan=document.getElementById("tujuan").value;
 
   if(!nama || !hp || !alamat || !tujuan){
-    alert("Lengkapi semua data pesanan");
+    alert("Lengkapi nama, nomor WhatsApp, alamat, dan pilih lokasi tujuan.");
     return;
   }
 
-  let total=0;
+  if(!ongkirTerhitung){
+    alert("Silakan hitung ongkir terlebih dahulu sebelum membuat pesanan.");
+    return;
+  }
+
+  let totalBarang=0;
   let detail="";
 
   Object.keys(keranjang).forEach(i=>{
     let p=barang[i],q=keranjang[i];
-    total+=p.price*q;
+    totalBarang+=p.price*q;
     detail+=`${p.name} x ${q} = ${rupiah(p.price*q)}\n`;
   });
+
+  let totalAkhir=totalBarang+ongkir;
+  let kurir=document.getElementById("courier");
+  let namaKurir=kurir.options[kurir.selectedIndex].text;
 
   let pesanWA=
     "PESANAN WARUNGTKS\n\n"+
     "Nama: "+nama+"\n"+
     "HP: "+hp+"\n"+
     "Alamat: "+alamat+"\n"+
-    "Tujuan: "+tujuan+"\n\n"+
+    "Tujuan: "+tujuan.label+"\n"+
+    "Kurir: "+namaKurir+"\n\n"+
     "DAFTAR BARANG:\n"+detail+
-    "\nTOTAL: "+rupiah(total);
+    "\nTotal barang: "+rupiah(totalBarang)+
+    "\nOngkir: "+rupiah(ongkir)+
+    "\nTOTAL PEMBAYARAN: "+rupiah(totalAkhir);
 
-  let url="https://wa.me/6283873608715?text="+
-    encodeURIComponent(pesanWA);
-
+  let url="https://wa.me/"+NOMOR_WA+"?text="+encodeURIComponent(pesanWA);
   window.location.href=url;
-  }
-  
+}
 
 tampilProduk();
+tampilKeranjang();
 </script>
 </body>
 </html>
