@@ -153,30 +153,65 @@ document.getElementById("locations").innerText=
 "Tujuan dipilih: "+tujuan.label;
 }
 
+
 async function hitungOngkir(){
-if(!tujuan){alert("Pilih lokasi tujuan dahulu");return;}
-let weight=0;
-Object.keys(keranjang).forEach(i=>{
-weight+=keranjang[i]*1000;
-});
-if(!weight){alert("Keranjang masih kosong");return;}
-let box=document.getElementById("result");
-box.innerText="Menghitung ongkir...";
-try{
-let r=await fetch(API+"/api/shipping/cost",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-destination:tujuan.id,
-weight:weight,
-courier:document.getElementById("courier").value
-})
-});
-let j=await r.json();
-if(!r.ok){box.innerText=j.message||"Gagal menghitung ongkir.";return;}
-box.innerText=JSON.stringify(j,null,2);
-}catch(e){box.innerText="Gagal terhubung ke server ongkir.";}
+  if(!tujuan){
+    alert("Pilih lokasi tujuan dahulu");
+    return;
+  }
+
+  let weight=0;
+  Object.keys(keranjang).forEach(i=>{
+    weight+=keranjang[i]*1000;
+  });
+
+  if(!weight){
+    alert("Keranjang masih kosong");
+    return;
+  }
+
+  let box=document.getElementById("result");
+  box.innerText="Menghitung ongkir...";
+
+  try{
+    let r=await fetch(API+"/api/shipping/cost",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        destination:tujuan.id,
+        weight:weight,
+        courier:document.getElementById("courier").value
+      })
+    });
+
+    let j=await r.json();
+
+    if(!r.ok){
+      box.innerText=j.message||"Gagal menghitung ongkir";
+      return;
+    }
+
+    let daftar=j.data||[];
+
+    if(!daftar.length){
+      box.innerText="Tarif ongkir tidak ditemukan";
+      return;
+    }
+
+    let x=daftar[0];
+    ongkir=Number(x.cost)||0;
+
+    box.innerHTML=
+      "<b>"+x.name+" - "+x.description+"</b><br>"+
+      "<h2>"+rupiah(ongkir)+"</h2>"+
+      "<small>Layanan: "+x.service+
+      (x.etd?" | Estimasi: "+x.etd:"")+"</small>";
+
+  }catch(e){
+    box.innerText="Gagal terhubung ke server ongkir";
+  }
 }
+  
 
 
 function pesan(){
