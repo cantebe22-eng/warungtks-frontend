@@ -1,314 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WarungTKS - Belanja Sembako</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6b3c24">
+<title>WarungTKS — Belanja Harian Dekat & Lengkap</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
-header{background:#090909;padding:22px 16px;border-bottom:1px solid #b89545}
-.logo{font-size:27px;font-weight:bold;color:#e5c16b}
-.logo span{color:white}
-header p{color:#aaa;margin-bottom:0}
-main{padding:18px}
-h2{color:#e5c16b}
-.hero{background:linear-gradient(120deg,#292015,#080808);padding:28px 20px;border-radius:14px;margin-bottom:25px}
-.hero h1{color:#e6c36b}
-button{background:#c49a43;color:#111;border:0;padding:12px 18px;border-radius:7px;font-weight:bold;cursor:pointer}
-.products{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.product{background:#1c1c1c;border:1px solid #4d4028;border-radius:10px;padding:12px}
-.product .pic{font-size:42px;text-align:center;padding:15px}
-.product h3{font-size:15px}
-.price{color:#e5c16b;font-weight:bold}.wholesale{color:#9bd39b;font-size:12px;margin-top:5px}
-.product button{width:100%;margin-top:10px}
-.panel{background:#1c1c1c;padding:16px;border-radius:12px;margin-top:22px}
-input,select{width:100%;padding:13px;margin:7px 0;background:#101010;color:white;border:1px solid #777;border-radius:6px}
-.cartitem{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #444}
-small{color:#bbb}
-#result{font-size:14px;color:#e5c16b;line-height:1.6}
-#locations button{text-align:left;white-space:normal}
-footer{text-align:center;color:#999;padding:30px}
-@media(max-width:360px){.products{grid-template-columns:1fr}}
-</style>
-</head>
+:root{--brown:#6b3c24;--brown2:#8b5636;--cream:#fbf7f0;--paper:#fff;--line:#e8dfd2;--ink:#2c211b;--muted:#88796e;--gold:#d7b66a}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;background:var(--brown);color:white;font-weight:700}button.secondary{background:#f4eadb;color:var(--brown);border:1px solid var(--line)}button:disabled{opacity:.5;cursor:not-allowed}
+header{position:sticky;top:0;z-index:5;background:#fffaf4;border-bottom:1px solid var(--line);padding:15px max(18px,calc((100% - 1100px)/2));display:flex;gap:15px;align-items:center;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;min-width:210px}.mark{width:52px;height:52px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--brown);font-weight:900;font-size:14px}.brand strong{display:block;font-size:24px;color:var(--brown)}.brand small{color:var(--muted)}.search{display:flex;flex:1;min-width:220px}.search input{border-radius:25px 0 0 25px}.search button{border-radius:0 25px 25px 0}
+input,select,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);margin:5px 0 12px}label{display:block;color:var(--muted);font-size:14px;font-weight:600;margin-top:7px}
+nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px;background:#fff;border-bottom:1px solid var(--line)}nav button{background:transparent;color:var(--brown);border:1px solid var(--line);padding:9px 13px}
+main{max-width:1100px;margin:auto;padding:22px 16px 90px}.hero{background:linear-gradient(110deg,#f0e2ce,#fffaf4);border:1px solid var(--line);border-radius:22px;padding:28px;margin:8px 0 25px}.hero h1{font-size:clamp(28px,5vw,42px);line-height:1.12;margin:0 0 10px;color:var(--brown)}.hero p{color:var(--muted);font-size:17px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.section-title h2{color:var(--brown)}.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}.product,.panel{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:15px}.pic{height:105px;background:#faf3e9;border-radius:12px;display:grid;place-items:center;font-size:48px}.product h3{font-size:15px;min-height:38px}.price{font-weight:800;color:var(--brown);font-size:18px}.hint{font-size:12px;color:#63845a;margin:5px 0}.product button{width:100%;margin-top:9px}.panel{margin-top:20px}.panel h2{color:var(--brown);margin-top:0}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.cartrow{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0}.qty button{padding:4px 10px;margin:0 4px}.muted{color:var(--muted);font-size:13px}.total{font-size:20px;font-weight:800;color:var(--brown)}.hidden{display:none!important}.notice{padding:13px;background:#f6eddf;border-radius:12px;margin:10px 0;color:var(--brown)}.location-choice{display:block;width:100%;text-align:left;margin:6px 0;background:#f4eadb;color:var(--brown)}.payment{border:1px dashed var(--gold);border-radius:14px;padding:15px;margin-top:12px}.payment img{display:block;max-width:240px;width:100%;margin:12px auto;border-radius:10px}.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px;z-index:6}.bottom button{background:transparent;color:var(--muted);padding:7px;font-size:12px}.bottom button span{display:block;font-size:20px}footer{text-align:center;color:var(--muted);padding:28px}
+@media(min-width:760px){.bottom{display:none}}@media(max-width:500px){header{padding:12px}.brand{flex:1}.brand strong{font-size:21px}.search{order:2;flex-basis:100%}.hero{padding:22px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}.product{padding:10px}.pic{height:90px}}
+</style></head>
 <body>
-<header>
-<div class="logo">WARUNG<span>TKS</span></div>
-<p>Belanja Sembako Mudah dan Hemat</p>
-</header>
-
-<main>
-<section class="hero">
-<h1>Selamat Datang di WarungTKS</h1>
-<p>Belanja sembako dan kebutuhan harian dengan mudah.</p>
-<button onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Belanja Sekarang</button>
-</section>
-
-<h2 id="produk">Katalog Produk</h2><p><small>Harga grosir otomatis berlaku mulai 12 pcs per jenis barang (diskon 5%).</small></p>
-<div class="products" id="products"></div>
-
-<section class="panel">
-<h2>Keranjang Belanja</h2>
-<div id="cart">Keranjang masih kosong.</div>
-<p>Total barang: <b id="total">Rp0</b></p>
-</section>
-
-<section class="panel">
-<h2>Checkout & Pengiriman</h2>
-<input id="nama" placeholder="Nama pembeli" autocomplete="name">
-<input id="hp" placeholder="Nomor WhatsApp" inputmode="tel" autocomplete="tel">
-<input id="alamat" placeholder="Alamat lengkap penerima" autocomplete="street-address">
-
-<h3>Cari kecamatan / kelurahan tujuan</h3>
-<input id="search" placeholder="Contoh: Kranji, Bekasi">
-<button onclick="cariLokasi()">Cari Lokasi</button>
-<div id="locations"></div>
-
-<h3>Pilih Kurir</h3>
-<select id="courier" onchange="resetOngkir()">
-<option value="jne">JNE</option>
-<option value="jnt">J&T</option>
-<option value="sicepat">SiCepat</option>
-<option value="pos">POS Indonesia</option>
-</select>
-<button onclick="hitungOngkir()">Hitung Ongkir</button>
-<div id="result">Pilih tujuan dan hitung ongkir untuk melihat biaya pengiriman.</div>
-<button onclick="pesan()" style="width:100%;margin-top:20px">Buat Pesanan</button>
-</section>
-</main>
-
-<section class="panel" id="admin">
-<h2>Admin WarungTKS</h2>
-<p><small>Masuk untuk mengelola katalog dan melihat pesanan.</small></p>
-<input id="adminPass" type="password" placeholder="Password admin">
-<button onclick="adminLogin()">Masuk Admin</button>
-<div id="adminArea" style="display:none">
-<h3>Tambah Produk</h3>
-<input id="newName" placeholder="Nama barang">
-<input id="newPrice" type="number" placeholder="Harga eceran (Rp)">
-<input id="newWholesale" type="number" placeholder="Harga grosir (Rp)">
-<input id="newMin" type="number" value="12" placeholder="Minimal pembelian grosir">
-<input id="newStock" type="number" value="0" placeholder="Stok">
-<button onclick="simpanProduk()">Simpan Produk</button>
-<h3>Daftar Produk</h3><div id="adminProducts"></div>
-<h3>Pesanan Masuk</h3><button onclick="muatPesanan()">Muat Pesanan</button><div id="adminOrders"></div>
-</div><p id="adminMsg"></p>
-</section>
-<footer>© 2026 WarungTKS - Belanja Hemat dan Praktis</footer>
-
+<header><div class="brand"><div class="mark">TKS</div><div><strong>WarungTKS</strong><small>Belanja harian, dekat & lengkap</small></div></div><div class="search"><input id="searchProduct" placeholder="Cari produk..."><button onclick="cariProduk()">Cari</button></div></header>
+<nav><button onclick="go('home')">⌂ Beranda</button><button onclick="go('produk')">▦ Kategori</button><button onclick="go('cartPanel')">🛒 Keranjang <b id="cartCount">0</b></button><button onclick="go('tracking')">▣ Lacak</button><button onclick="go('account')">♙ Akun</button></nav>
+<main id="home">
+<section class="hero"><h1>Belanja kebutuhan harian jadi lebih mudah</h1><p>Sembako, kebutuhan rumah, dan harga grosir untuk belanja lebih hemat.</p><button onclick="go('produk')">Mulai Belanja</button></section>
+<div class="section-title"><h2 id="produk">Produk pilihan</h2><span class="muted">Harga grosir tersedia</span></div><div class="products" id="products"></div>
+<div class="grid2">
+<section class="panel" id="cartPanel"><h2>Keranjang belanja</h2><div id="cart">Keranjang masih kosong.</div><div class="total" id="subtotal">Subtotal: Rp0</div></section>
+<section class="panel" id="checkout"><h2>Checkout & pengiriman</h2>
+<label>Nama penerima</label><input id="nama" placeholder="Nama lengkap" autocomplete="name">
+<label>Nomor WhatsApp</label><input id="hp" placeholder="08xxxxxxxxxx" inputmode="tel" autocomplete="tel">
+<label>Alamat lengkap</label><textarea id="alamat" rows="2" placeholder="Nama jalan, nomor rumah, RT/RW, patokan"></textarea>
+<label>Cari kecamatan / kelurahan tujuan</label><div class="search"><input id="searchLoc" placeholder="Contoh: Kranji, Bekasi"><button onclick="cariLokasi()">Cari</button></div><div id="locations" class="muted"></div>
+<label>Pilih kurir</label><select id="courier" onchange="resetOngkir()"><option value="jne">JNE</option><option value="jnt">J&T</option><option value="sicepat">SiCepat</option><option value="pos">POS Indonesia</option></select>
+<button class="secondary" onclick="hitungOngkir()">Hitung ongkir</button><div id="shippingResult" class="notice">Pilih tujuan dan hitung ongkir.</div>
+<label>Metode pembayaran</label><select id="paymentMethod"><option value="qris">QRIS</option><option value="transfer">Transfer bank</option></select>
+<label>Catatan pesanan (opsional)</label><textarea id="note" rows="2" placeholder="Catatan untuk penjual"></textarea>
+<button style="width:100%" onclick="buatPesanan()">Buat pesanan</button><div id="orderResult"></div>
+</section></div>
+<section class="panel" id="tracking"><h2>Lacak pesanan</h2><p class="muted">Masukkan nomor pesanan dan nomor WhatsApp yang digunakan saat checkout.</p><div class="grid2"><div><label>Nomor pesanan</label><input id="trackId" placeholder="Contoh: 102"></div><div><label>Nomor WhatsApp</label><input id="trackPhone" placeholder="08xxxxxxxxxx"></div></div><button onclick="lacakPesanan()">Lacak pesanan</button><div id="trackResult"></div></section>
+<section class="panel" id="account"><h2>Akun pelanggan</h2><p>Pesanan dapat dilacak menggunakan nomor pesanan dan nomor WhatsApp pada menu Lacak.</p><button class="secondary" onclick="go('tracking')">Lacak pesanan saya</button></section>
+<section class="panel" id="admin"><h2>Admin WarungTKS</h2><p class="muted">Masuk untuk mengelola produk, pesanan, pembayaran, dan nomor resi.</p><label>Password admin</label><input id="adminPass" type="password" placeholder="Password admin"><button onclick="adminLogin()">Masuk Admin</button><div id="adminMsg" class="muted"></div>
+<div id="adminArea" class="hidden"><div class="grid2"><div><h3>Tambah produk</h3><label>Nama produk</label><input id="newName" placeholder="Nama barang"><label>Harga eceran</label><input id="newPrice" type="number" placeholder="Harga"><label>Harga grosir</label><input id="newWholesale" type="number" placeholder="Harga grosir"><label>Minimal grosir</label><input id="newMin" type="number" value="12"><label>Stok</label><input id="newStock" type="number" value="0"><button onclick="simpanProduk()">Simpan produk</button></div><div><h3>Daftar produk</h3><button class="secondary" onclick="muatProdukAdmin()">Muat produk</button><div id="adminProducts"></div></div></div><h3>Pesanan masuk</h3><button class="secondary" onclick="muatPesanan()">Muat pesanan</button><div id="adminOrders"></div></div></section>
+</main><div class="bottom"><button onclick="go('home')"><span>⌂</span>Beranda</button><button onclick="go('produk')"><span>▦</span>Kategori</button><button onclick="go('cartPanel')"><span>🛒</span>Keranjang</button><button onclick="go('tracking')"><span>▣</span>Lacak</button><button onclick="go('account')"><span>♙</span>Akun</button></div><footer>© 2026 WarungTKS · Belanja hemat dan praktis</footer>
 <script>
 const API="https://warungtks-backend-production-b067.up.railway.app";
-const NOMOR_WA="6283873608715";
-let adminPassword="";
-
-const barang=[
-{name:"Beras 5 Kg",price:75000,icon:"🍚"},
-{name:"Minyak Goreng 1 Liter",price:19000,icon:"🛢️"},
-{name:"Gula Pasir 1 Kg",price:17000,icon:"🍬"},
-{name:"Tepung Terigu 1 Kg",price:12000,icon:"🌾"},
-{name:"Tepung Aci 1 Kg",price:12000,icon:"🥣"},
-{name:"Telur 1 Kg",price:29000,icon:"🥚"},
-{name:"Mie Instan",price:3500,icon:"🍜"},
-{name:"Kopi Sachet",price:2000,icon:"☕"}
-];
-
-let keranjang=JSON.parse(localStorage.getItem("warungtks_cart")||"{}");
-let tujuan=null;
-let ongkir=0;
-let ongkirTerhitung=false;
-
-const rupiah=n=>"Rp"+Number(n).toLocaleString("id-ID");
-
-function resetOngkir(){
-  ongkir=0;
-  ongkirTerhitung=false;
-  document.getElementById("result").innerText="Pilihan kurir berubah. Hitung ulang ongkir.";
-}
-
-function tampilProduk(){
-  document.getElementById("products").innerHTML=barang.map((p,i)=>`
-    <div class="product">
-      <div class="pic">${p.icon}</div>
-      <h3>${p.name}</h3>
-      <div class="price">${rupiah(p.price)}</div><div class="wholesale">Grosir 12+: ${rupiah(Math.round(p.price*0.95))}/pcs</div>
-      <button onclick="tambah(${i})">Tambah</button>
-    </div>`).join("");
-}
-
-function simpanKeranjang(){localStorage.setItem("warungtks_cart",JSON.stringify(keranjang));}
-function ubahJumlah(i,delta){
-  keranjang[i]=(keranjang[i]||0)+delta;
-  if(keranjang[i]<=0) delete keranjang[i];
-  simpanKeranjang(); resetOngkir(); tampilKeranjang();
-}
-function tambah(i){
-  keranjang[i]=(keranjang[i]||0)+1;
-  simpanKeranjang(); resetOngkir(); tampilKeranjang();
-}
-
-function tampilKeranjang(){
-  let keys=Object.keys(keranjang);
-  let total=0;
-  let html="";
-  keys.forEach(i=>{
-    let p=barang[i],q=keranjang[i];
-    let harga=q>=12?Math.round(p.price*0.95):p.price;
-    total+=harga*q;
-    html+=`<div class="cartitem"><span>${p.name}<br><small>${rupiah(harga)} / pcs ${q>=12?"(harga grosir)":""}</small><br><button onclick="ubahJumlah(${i},-1)" style="padding:5px 11px">−</button> ${q} <button onclick="ubahJumlah(${i},1)" style="padding:5px 11px">+</button></span><b>${rupiah(p.price*q)}</b></div>`;
-  });
-  document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";
-  document.getElementById("total").innerText=rupiah(total);
-}
-
-async function cariLokasi(){
-  let s=document.getElementById("search").value.trim();
-  if(s.length<3){alert("Masukkan minimal 3 huruf");return;}
-  let box=document.getElementById("locations");
-  box.innerText="Mencari lokasi...";
-  try{
-    let r=await fetch(API+"/api/destination/search?search="+encodeURIComponent(s));
-    let j=await r.json();
-    let data=j.data||[];
-    if(!r.ok){box.innerText=j.message||"Gagal mencari lokasi";return;}
-    if(!data.length){box.innerText="Lokasi tidak ditemukan";return;}
-    window.hasillokasi=data;
-    box.innerHTML=data.map((d,i)=>`
-      <button style="display:block;margin:8px 0;width:100%"
-      onclick="pilihLokasi(${i})">${d.label}</button>`).join("");
-  }catch(e){
-    box.innerText="Gagal mencari lokasi. Periksa koneksi internet.";
-  }
-}
-
-function pilihLokasi(i){
-  tujuan=window.hasillokasi[i];
-  resetOngkir();
-  document.getElementById("locations").innerText="Tujuan dipilih: "+tujuan.label;
-}
-
-async function hitungOngkir(){
-  if(!tujuan){
-    alert("Pilih lokasi tujuan dahulu");
-    return;
-  }
-
-  let weight=0;
-  Object.keys(keranjang).forEach(i=>{
-    weight+=keranjang[i]*1000;
-  });
-
-  if(!weight){
-    alert("Keranjang masih kosong");
-    return;
-  }
-
-  let box=document.getElementById("result");
-  box.innerText="Menghitung ongkir...";
-  ongkirTerhitung=false;
-
-  try{
-    let r=await fetch(API+"/api/shipping/cost",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        destination:tujuan.id,
-        weight:weight,
-        courier:document.getElementById("courier").value
-      })
-    });
-
-    let j=await r.json();
-
-    if(!r.ok){
-      box.innerText=j.message||"Gagal menghitung ongkir";
-      return;
-    }
-
-    let daftar=j.data||[];
-    if(!daftar.length){
-      box.innerText="Tarif ongkir tidak ditemukan";
-      return;
-    }
-
-    let x=daftar[0];
-    ongkir=Number(x.cost)||0;
-    ongkirTerhitung=true;
-
-    box.innerHTML=
-      "<b>"+x.name+" - "+x.description+"</b><br>"+
-      "<h2>"+rupiah(ongkir)+"</h2>"+
-      "<small>Layanan: "+x.service+
-      (x.etd?" | Estimasi: "+x.etd:"")+"</small>";
-  }catch(e){
-    box.innerText="Gagal terhubung ke server ongkir. Coba lagi.";
-  }
-}
-
-async function adminLogin(){
- adminPassword=document.getElementById("adminPass").value;
- const msg=document.getElementById("adminMsg");
- try{const r=await fetch(API+"/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPassword})});const j=await r.json();if(!r.ok)throw new Error(j.error||"Login gagal");document.getElementById("adminArea").style.display="block";msg.innerText="Berhasil masuk.";muatProdukAdmin();}catch(e){msg.innerText=e.message;}
-}
-async function adminFetch(path,opts={}){return fetch(API+path,{...opts,headers:{"Content-Type":"application/json","x-admin-password":adminPassword,...(opts.headers||{})}});}
-async function simpanProduk(){
- const data={name:document.getElementById("newName").value,price:Number(document.getElementById("newPrice").value),wholesale_price:Number(document.getElementById("newWholesale").value),wholesale_min:Number(document.getElementById("newMin").value)||12,stock:Number(document.getElementById("newStock").value)||0};
- try{const r=await adminFetch("/api/admin/products",{method:"POST",body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminMsg").innerText="Produk tersimpan.";muatProdukAdmin();}catch(e){document.getElementById("adminMsg").innerText=e.message;}
-}
-async function muatProdukAdmin(){try{const r=await adminFetch("/api/admin/products");const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminProducts").innerHTML=j.data.map(p=>"<p>"+p.name+" — "+rupiah(p.price)+" | stok "+p.stock+"</p>").join("")||"Belum ada produk di database.";}catch(e){document.getElementById("adminProducts").innerText=e.message;}}
-async function muatPesanan(){try{const r=await adminFetch("/api/admin/orders");const j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminOrders").innerHTML=j.data.map(o=>"<div class='cartitem'><span>#"+o.id+" "+o.customer_name+"<br><small>"+o.phone+" · "+o.status+"</small></span><b>"+rupiah(o.total)+"</b></div>").join("")||"Belum ada pesanan tersimpan.";}catch(e){document.getElementById("adminOrders").innerText=e.message;}}
-function pesan(){
-  if(!Object.keys(keranjang).length){
-    alert("Keranjang masih kosong");
-    return;
-  }
-
-  let nama=document.getElementById("nama").value.trim();
-  let hp=document.getElementById("hp").value.trim();
-  let alamat=document.getElementById("alamat").value.trim();
-
-  if(!nama || !hp || !alamat || !tujuan){
-    alert("Lengkapi nama, nomor WhatsApp, alamat, dan pilih lokasi tujuan.");
-    return;
-  }
-
-  if(!ongkirTerhitung){
-    alert("Silakan hitung ongkir terlebih dahulu sebelum membuat pesanan.");
-    return;
-  }
-
-  let totalBarang=0;
-  let detail="";
-
-  Object.keys(keranjang).forEach(i=>{
-    let p=barang[i],q=keranjang[i];
-    let harga=q>=12?Math.round(p.price*0.95):p.price;
-    totalBarang+=harga*q;
-    detail+=`${p.name} x ${q} @ ${rupiah(harga)}${q>=12?" (GROSIR)":""} = ${rupiah(harga*q)}\n`;
-  });
-
-  let totalAkhir=totalBarang+ongkir;
-  let kurir=document.getElementById("courier");
-  let namaKurir=kurir.options[kurir.selectedIndex].text;
-
-  let pesanWA=
-    "PESANAN WARUNGTKS\n\n"+
-    "Nama: "+nama+"\n"+
-    "HP: "+hp+"\n"+
-    "Alamat: "+alamat+"\n"+
-    "Tujuan: "+tujuan.label+"\n"+
-    "Kurir: "+namaKurir+"\n\n"+
-    "DAFTAR BARANG:\n"+detail+
-    "\nTotal barang: "+rupiah(totalBarang)+
-    "\nOngkir: "+rupiah(ongkir)+
-    "\nTOTAL PEMBAYARAN: "+rupiah(totalAkhir);
-
-  let url="https://wa.me/"+NOMOR_WA+"?text="+encodeURIComponent(pesanWA);
-  window.location.href=url;
-}
-
-tampilProduk();
-tampilKeranjang();
-</script>
-</body>
-</html>
+const WA="6283873608715";
+let barang=[{id:"beras",name:"Beras 5 Kg",price:75000,wholesale_price:71250,wholesale_min:12,icon:"🍚"},{id:"minyak",name:"Minyak Goreng 1 Liter",price:19000,wholesale_price:18050,wholesale_min:12,icon:"🛢️"},{id:"gula",name:"Gula Pasir 1 Kg",price:17000,wholesale_price:16150,wholesale_min:12,icon:"🍬"},{id:"terigu",name:"Tepung Terigu 1 Kg",price:12000,wholesale_price:11400,wholesale_min:12,icon:"🌾"},{id:"aci",name:"Tepung Aci 1 Kg",price:12000,wholesale_price:11400,wholesale_min:12,icon:"🥣"},{id:"telur",name:"Telur 1 Kg",price:29000,wholesale_price:27550,wholesale_min:12,icon:"🥚"},{id:"mie",name:"Mie Instan",price:3500,wholesale_price:3325,wholesale_min:12,icon:"🍜"},{id:"kopi",name:"Kopi Sachet",price:2000,wholesale_price:1900,wholesale_min:12,icon:"☕"}];
+let cart=JSON.parse(localStorage.getItem("warungtks_cart")||"{}"),destination=null,shipping=0,shippingService="",shippingReady=false,adminPassword="",paymentInfo={};
+const rp=n=>"Rp"+Number(n||0).toLocaleString("id-ID");
+function go(id){document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"})}
+async function init(){try{let r=await fetch(API+"/api/products");let j=await r.json();if(r.ok&&j.data?.length)barang=j.data.map(p=>({...p,icon:"🛍️"}));}catch(e){}try{let r=await fetch(API+"/api/payment-info");paymentInfo=await r.json()}catch(e){}renderProducts();renderCart()}
+function renderProducts(filter=""){let list=barang.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()));document.getElementById("products").innerHTML=list.map(p=>'<article class="product"><div class="pic">'+(p.icon||"🛍️")+'</div><h3>'+esc(p.name)+'</h3><div class="price">'+rp(p.price)+'</div><div class="hint">Grosir '+(p.wholesale_min||12)+'+: '+rp(p.wholesale_price||p.price)+'</div><button onclick="addCart(\''+p.id+'\')">Tambah ke keranjang</button></article>').join("")||"Produk tidak ditemukan."}
+function cariProduk(){renderProducts(document.getElementById("searchProduct").value)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function saveCart(){localStorage.setItem("warungtks_cart",JSON.stringify(cart))}
+function addCart(id){cart[id]=(cart[id]||0)+1;saveCart();renderCart();resetOngkir()}
+function qty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];saveCart();renderCart();resetOngkir()}
+function unitPrice(p,q){return q>=(p.wholesale_min||12)?Number(p.wholesale_price||p.price):Number(p.price)}
+function renderCart(){let html="",sub=0,count=0;Object.entries(cart).forEach(([id,q])=>{let p=barang.find(x=>String(x.id)===String(id));if(!p)return;let price=unitPrice(p,q);sub+=price*q;count+=q;html+='<div class="cartrow"><div><b>'+esc(p.name)+'</b><div class="muted">'+rp(price)+' / pcs</div><div class="qty"><button class="secondary" onclick="qty(\''+id+'\',-1)">−</button>'+q+'<button class="secondary" onclick="qty(\''+id+'\',1)">+</button></div></div><b>'+rp(price*q)+'</b></div>'});document.getElementById("cart").innerHTML=html||"Keranjang masih kosong.";document.getElementById("subtotal").innerText="Subtotal: "+rp(sub);document.getElementById("cartCount").innerText=count}
+function cartData(){return Object.entries(cart).map(([id,q])=>{let p=barang.find(x=>String(x.id)===String(id));return p?{product_id:p.id,name:p.name,quantity:q,unit_price:unitPrice(p,q),total:unitPrice(p,q)*q}:null}).filter(Boolean)}
+function resetOngkir(){shipping=0;shippingReady=false;shippingService="";document.getElementById("shippingResult").innerText="Keranjang atau kurir berubah. Hitung ulang ongkir."}
+async function cariLokasi(){let s=document.getElementById("searchLoc").value.trim(),box=document.getElementById("locations");if(s.length<3){box.innerText="Masukkan minimal 3 huruf.";return}box.innerText="Mencari lokasi...";try{let r=await fetch(API+"/api/destination/search?search="+encodeURIComponent(s)),j=await r.json();let rows=j.data||[];if(!r.ok||!rows.length){box.innerText=j.message||"Lokasi tidak ditemukan.";return}window.locationRows=rows;box.innerHTML=rows.map((x,i)=>'<button class="location-choice" onclick="pilihLokasi('+i+')">'+esc(x.label)+'</button>').join("")}catch(e){box.innerText="Gagal mencari lokasi. Coba lagi."}}
+function pilihLokasi(i){destination=window.locationRows[i];resetOngkir();document.getElementById("locations").innerText="Tujuan dipilih: "+destination.label}
+async function hitungOngkir(){let items=cartData();if(!destination||!items.length){alert("Isi keranjang dan pilih lokasi tujuan dahulu.");return}let weight=items.reduce((n,x)=>n+x.quantity*1000,0),box=document.getElementById("shippingResult");box.innerText="Menghitung ongkir...";try{let r=await fetch(API+"/api/shipping/cost",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({destination:destination.id,weight,courier:document.getElementById("courier").value})}),j=await r.json(),rows=j.data||[];if(!r.ok||!rows.length){box.innerText=j.error||j.message||"Tarif tidak ditemukan.";return}let x=rows[0];shipping=Number(x.cost)||0;shippingService=x.name+" "+x.service;shippingReady=true;box.innerHTML="<b>"+esc(shippingService)+"</b><br><span class='total'>"+rp(shipping)+"</span><br><small>Estimasi "+esc(x.etd||"sesuai kurir")+"</small>"}catch(e){box.innerText="Server ongkir tidak dapat dihubungi."}}
+async function buatPesanan(){let items=cartData(),nama=document.getElementById("nama").value.trim(),hp=document.getElementById("hp").value.trim(),alamat=document.getElementById("alamat").value.trim();if(!items.length||!nama||!hp||!alamat||!destination){alert("Lengkapi keranjang, nama, nomor WhatsApp, alamat, dan tujuan.");return}if(!shippingReady){alert("Hitung ongkir dahulu.");return}let subtotal=items.reduce((n,x)=>n+x.total,0),method=document.getElementById("paymentMethod").value,body={customer_name:nama,phone:hp,address:alamat,items,subtotal,shipping,total:subtotal+shipping,payment_method:method,shipping_service:shippingService,destination:destination.label,customer_note:document.getElementById("note").value};let box=document.getElementById("orderResult");box.innerText="Menyimpan pesanan...";try{let r=await fetch(API+"/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),j=await r.json();if(!r.ok)throw new Error(j.error||"Pesanan gagal disimpan");cart={};saveCart();renderCart();box.innerHTML='<div class="payment"><h3>Pesanan berhasil dibuat!</h3><p>Nomor pesanan: <b>#'+j.order.id+'</b></p><p>Total pembayaran: <b class="total">'+rp(j.order.total)+'</b></p><p>Status: Menunggu pembayaran</p>'+paymentBlock(method,j.order.total)+'<p class="muted">Simpan nomor pesanan. Admin akan memeriksa pembayaran secara manual.</p></div>';box.scrollIntoView({behavior:"smooth"})}catch(e){box.innerText=e.message}}
+function paymentBlock(method,total){if(method==="qris"){return paymentInfo.qris_image_url?'<h3>Bayar dengan QRIS</h3><img alt="QRIS WarungTKS" src="'+esc(paymentInfo.qris_image_url)+'"><p>Scan QRIS di atas sesuai total pembayaran '+rp(total)+'.</p>':'<p>QRIS belum dipasang oleh admin. Hubungi WarungTKS untuk instruksi pembayaran.</p>'}return '<h3>Transfer bank</h3><p>Bank: <b>'+esc(paymentInfo.bank_name||"Belum diatur")+'</b></p><p>No. rekening: <b>'+esc(paymentInfo.bank_account||"Belum diatur")+'</b></p><p>Atas nama: <b>'+esc(paymentInfo.bank_holder||"Belum diatur")+'</b></p><p>Transfer tepat '+rp(total)+' lalu simpan bukti transfer.</p>'}
+async function lacakPesanan(){let id=document.getElementById("trackId").value.trim(),phone=document.getElementById("trackPhone").value.trim(),box=document.getElementById("trackResult");box.innerText="Memeriksa pesanan...";try{let r=await fetch(API+"/api/orders/"+encodeURIComponent(id)+"?phone="+encodeURIComponent(phone)),j=await r.json();if(!r.ok)throw new Error(j.error);let o=j.data;box.innerHTML='<div class="notice"><b>Pesanan #'+o.id+'</b><p>Status pesanan: '+esc(o.status)+'</p><p>Status pembayaran: '+esc(o.payment_status)+'</p><p>Total: '+rp(o.total)+'</p><p>Kurir: '+esc(o.shipping_service||"-")+'</p><p>Nomor resi: <b>'+esc(o.tracking_number||"Belum tersedia")+'</b></p></div>'}catch(e){box.innerText=e.message}}
+async function adminFetch(path,opts={}){return fetch(API+path,{...opts,headers:{"Content-Type":"application/json","x-admin-password":adminPassword,...(opts.headers||{})}})}
+async function adminLogin(){adminPassword=document.getElementById("adminPass").value;let msg=document.getElementById("adminMsg");try{let r=await fetch(API+"/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPassword})}),j=await r.json();if(!r.ok)throw new Error(j.error||"Login gagal");document.getElementById("adminArea").classList.remove("hidden");msg.innerText="Berhasil masuk admin.";muatProdukAdmin();muatPesanan()}catch(e){msg.innerText=e.message}}
+async function simpanProduk(){let data={name:document.getElementById("newName").value,price:Number(document.getElementById("newPrice").value),wholesale_price:Number(document.getElementById("newWholesale").value),wholesale_min:Number(document.getElementById("newMin").value)||12,stock:Number(document.getElementById("newStock").value)||0};try{let r=await adminFetch("/api/admin/products",{method:"POST",body:JSON.stringify(data)}),j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminMsg").innerText="Produk berhasil disimpan.";muatProdukAdmin();init()}catch(e){document.getElementById("adminMsg").innerText=e.message}}
+async function muatProdukAdmin(){try{let r=await adminFetch("/api/admin/products"),j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminProducts").innerHTML=j.data.map(p=>'<p>'+esc(p.name)+' — '+rp(p.price)+' · stok '+p.stock+'</p>').join("")||"Belum ada produk."}catch(e){document.getElementById("adminProducts").innerText=e.message}}
+async function muatPesanan(){try{let r=await adminFetch("/api/admin/orders"),j=await r.json();if(!r.ok)throw new Error(j.error);document.getElementById("adminOrders").innerHTML=j.data.map(o=>'<div class="panel"><b>Pesanan #'+o.id+' · '+esc(o.customer_name)+'</b><p>'+esc(o.phone)+' · '+rp(o.total)+'</p><p>Metode: '+esc(o.payment_method)+' | Pembayaran: '+esc(o.payment_status)+'</p><label>Status pesanan</label><select id="status-'+o.id+'"><option '+(o.status==="Baru"?"selected":"")+'>Baru</option><option '+(o.status==="Diproses"?"selected":"")+'>Diproses</option><option '+(o.status==="Dikirim"?"selected":"")+'>Dikirim</option><option '+(o.status==="Selesai"?"selected":"")+'>Selesai</option><option '+(o.status==="Dibatalkan"?"selected":"")+'>Dibatalkan</option></select><label>Status pembayaran</label><select id="pay-'+o.id+'"><option '+(o.payment_status==="Menunggu pembayaran"?"selected":"")+'>Menunggu pembayaran</option><option '+(o.payment_status==="Lunas"?"selected":"")+'>Lunas</option><option '+(o.payment_status==="Ditolak"?"selected":"")+'>Ditolak</option></select><label>Nomor resi</label><input id="resi-'+o.id+'" value="'+esc(o.tracking_number||"")+'" placeholder="Nomor resi kurir"><button onclick="updateOrder('+o.id+')">Simpan perubahan</button></div>').join("")||"Belum ada pesanan."}catch(e){document.getElementById("adminOrders").innerText=e.message}}
+async function updateOrder(id){let data={status:document.getElementById("status-"+id).value,payment_status:document.getElementById("pay-"+id).value,tracking_number:document.getElementById("resi-"+id).value};try{let r=await adminFetch("/api/admin/orders/"+id,{method:"PATCH",body:JSON.stringify(data)}),j=await r.json();if(!r.ok)throw new Error(j.error);alert("Pesanan diperbarui.");muatPesanan()}catch(e){alert(e.message)}}
+init();
+</script></body></html>
